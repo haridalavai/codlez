@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for Test Status
+enum TestStatus {
+  PASSED
+  FAILED
+  NOT_RUN
+  RUNNING
+}
+
+// Main Test Suite Model
+model test_suites {
+  id              String       @id @default(uuid())
+  name            String
+  description     String
+  created_by      String
+  organization_id String
+  url             String
+  no_of_tests     Int          @default(0)
+  latest_run      DateTime?
+  latest_result   TestStatus?  @default(NOT_RUN)
+  is_active       Boolean      @default(true)
+  is_deleted      Boolean      @default(false)
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  test_cases      test_cases[]
+  head_test_case  String?      // Points to the first test case in sequence (if needed)
+
+  test_suite_executions test_suite_executions[] // Relation to executions
+}
+
+// Test Case Model
+model test_cases {
+  id                 String      @id @default(uuid())
+  action             String
+  command            String?
+  locator            String?
+  content            String?
+  latest_run         DateTime?
+  latest_result      TestStatus? @default(NOT_RUN)
+  test_suite_id      String
+  test_suites        test_suites @relation(fields: [test_suite_id], references: [id])
+  next_test_case_id  String?     @unique
+  next_test_case     test_cases? @relation("linkedTestCase", fields: [next_test_case_id], references: [id])
+  previous_test_case test_cases? @relation("linkedTestCase")
+  created_by         String
+  created_at         DateTime    @default(now())
+  updated_at         DateTime    @updatedAt
+
+  is_deleted         Boolean     @default(false) // Soft delete flag
+
+  test_case_executions test_case_executions[]
+}
+
+// Test Suite Execution Model (Tracks each run of a test suite)
+model test_suite_executions {
+  id              String         @id @default(uuid())
+  test_suite_id   String
+  test_suite      test_suites     @relation(fields: [test_suite_id], references: [id])
+  started_at      DateTime        @default(now())
+  completed_at    DateTime?
+  overall_status  TestStatus      @default(NOT_RUN)  
+  test_case_executions test_case_executions[]  // Relation to track test case executions
+}
+
+// Test Case Execution Model (Stores result of each test case during an execution)
+model test_case_executions {
+  id                   String         @id @default(uuid())
+  test_case_id         String?
+  test_case            test_cases?     @relation(fields: [test_case_id], references: [id], onDelete: SetNull)
+  test_suite_execution_id String
+  test_suite_execution test_suite_executions @relation(fields: [test_suite_execution_id], references: [id])
+  executed_at          DateTime        @default(now())
+  result               TestStatus      @default(NOT_RUN)
+  execution_logs       String?         // Optional logs during execution
+  execution_time       Int?            // Optional time taken for execution (e.g., milliseconds)
+  
+  // Snapshot of test case order at time of execution
+  previous_test_case_id String?        // Previous test case in sequence
+  next_test_case_id     String?        // Next test case in sequence
+  sequence_position     Int            // Position in the test case order during execution
+
+  // Optional snapshot of test case data
+  snapshot_action       String         // Stores the action of the test case at the time of execution
+  snapshot_command      String?        // Stores the command at the time of execution
+  snapshot_locator      String?        // Stores locator if used at the time of execution
+}

@@ -6,6 +6,8 @@ import { Toaster } from "@repo/ui/components/ui/toaster";
 import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Icons } from "@repo/ui/components/icons";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import { SocketProvider } from "@/contexts/socket-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,23 +23,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <ClerkProvider
-        appearance={{
-          baseTheme: dark,
-        }}
-      >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <body className={inter.className}>
-            <ClerkLoading>
-              <div className="flex items-center justify-center h-screen">
-                <Icons.logoLoading className="size-18 fill-foreground" />
-              </div>
-            </ClerkLoading>
-            <ClerkLoaded>{children}</ClerkLoaded>
-          </body>
-          <Toaster />
-        </ThemeProvider>
-      </ClerkProvider>
+      <SocketProvider>
+        <ClerkProvider
+          appearance={{
+            baseTheme: dark,
+          }}
+        >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TooltipProvider delayDuration={0}>
+              <body className={inter.className}>
+                <ClerkLoading>
+                  <div className="flex items-center justify-center h-screen">
+                    <Icons.logoLoading className="size-18 fill-foreground" />
+                  </div>
+                </ClerkLoading>
+                <ClerkLoaded>{children}</ClerkLoaded>
+              </body>
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
+        </ClerkProvider>
+      </SocketProvider>
     </html>
   );
 }

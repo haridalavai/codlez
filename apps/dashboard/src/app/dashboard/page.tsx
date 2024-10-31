@@ -10,7 +10,9 @@ const Dashboard = () => {
   }, []);
 
   async function gett() {
-    const token = await getToken();
+    const token = await getToken({
+      template: "codlez_template",
+    });
     console.log(token);
   }
   return <div>Dashboard</div>;

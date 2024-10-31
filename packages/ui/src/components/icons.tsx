@@ -36,8 +36,23 @@ import {
   LifeBuoy,
   PanelLeftClose,
   PanelRightClose,
+  Info,
   FlaskConical,
+  Grip,
+  CircleX,
+  CircleCheck,
+  LoaderCircle,
 } from "lucide-react";
+
+import {
+  CheckCircledIcon,
+  CircleIcon,
+  CrossCircledIcon,
+  ReloadIcon,
+  PlayIcon,
+  PauseIcon,
+  StopIcon
+} from "@radix-ui/react-icons";
 
 export type Icon = typeof LucideIcon;
 
@@ -65,6 +80,15 @@ export const Icons = {
       />
     </svg>
   ),
+  ready: CircleIcon,
+  passed: CheckCircledIcon,
+  failed: CrossCircledIcon,
+  running: ReloadIcon,
+  info: Info,
+  grip: Grip,
+  play: PlayIcon,
+  pause: PauseIcon,
+  stop: StopIcon,
   close: X,
   test: FlaskConical,
   inbox: InboxIcon,

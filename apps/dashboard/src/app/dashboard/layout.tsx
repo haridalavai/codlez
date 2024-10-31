@@ -1,5 +1,5 @@
 "use client";
-import { notFound, redirect } from "next/navigation";
+import { notFound, redirect, usePathname } from "next/navigation";
 
 import { dashboardConfig } from "@/config/dashboard";
 import { MainNav } from "@/components/main-nav";
@@ -15,6 +15,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const pathName = usePathname();
   return (
     <div className="flex flex-col min-h-screen">
       {/* <header className="sticky top-0 z-40 border-b bg-background">
@@ -27,14 +28,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <aside className="flex-col hidden border-r w-fit md:flex bg-background">
           <DashboardNav items={dashboardConfig.sidebarNav} />
         </aside>
-        <main className="flex flex-col flex-1 w-full overflow-hidden ">
-          <div className="flex border border-t-0 border-l-0 border-r-0 items-center justify-end p-2 px-10">
+        <main className="flex flex-col flex-1 w-full overflow-hidden h-screen">
+          <div className="flex border border-t-0 border-l-0 border-r-0 items-center justify-between p-2 px-10">
             {/* <Button variant="outline" size="icon" aria-label="Home">
               <Icons.logo className="size-5 fill-foreground" />
             </Button> */}
             <OrganizationSwitcher />
           </div>
-          {children}
+          <div className=" h-full">{children}</div>
         </main>
       </div>
       {/* <SiteFooter className="border-t" /> */}

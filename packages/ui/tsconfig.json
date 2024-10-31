@@ -7,6 +7,9 @@
       "@repo/ui/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "../../apps/dashboard/src/components/breadcrumb-context.tsx"
+  ],
   "exclude": ["node_modules", "dist"]
 }

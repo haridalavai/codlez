@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ConfigModule } from '@nestjs/config';
-import { BrowserModule } from './modules/browser/browser.module';
+import { TestSuitesModule } from './modules/test-suites/test-suites.module';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { BrowserModule } from './modules/browser/browser.module';
       isGlobal: true,
     }),
     AuthenticationModule,
-    BrowserModule,
+    TestSuitesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
