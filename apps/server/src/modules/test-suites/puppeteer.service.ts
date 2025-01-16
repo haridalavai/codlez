@@ -22,10 +22,10 @@ export class PuppeteerService implements OnModuleDestroy {
    * @returns The launched Browser instance.
    */
   async launchBrowser(): Promise<Browser> {
-    if (this.browser) {
-      this.logger.warn('Browser instance already exists. Reusing the existing browser.');
-      return this.browser;
-    }
+    // if (this.browser) {
+    //   this.logger.warn('Browser instance already exists. Reusing the existing browser.');
+    //   return this.browser;
+    // }
 
     const launchOptions: Parameters<VanillaPuppeteer['launch']>[0] = {
       headless: this.getHeadlessMode(),
@@ -54,7 +54,7 @@ export class PuppeteerService implements OnModuleDestroy {
       throw new Error('BrowserNotLaunchedError: Browser has not been launched yet.');
     }
     const wsEndpoint = this.browser.wsEndpoint();
-    const debuggerUrl = `http://localhost:3002/devtools/inspector.html?ws=${wsEndpoint}`;
+    const debuggerUrl = `http://localhost:9222/devtools/inspector.html?ws=${wsEndpoint}`;
     this.logger.debug(`Debugger URL: ${debuggerUrl}`);
     return debuggerUrl;
   }
@@ -144,7 +144,7 @@ export class PuppeteerService implements OnModuleDestroy {
    */
   private getHeadlessMode(): boolean {
     const headless = this.configService.get<string>('PUPPETEER_HEADLESS', 'true');
-    return headless.toLowerCase() === 'true';
+    return false;
   }
 
   /**
@@ -154,7 +154,7 @@ export class PuppeteerService implements OnModuleDestroy {
   private getBrowserArgs(): string[] {
     const args = this.configService.get<string>('PUPPETEER_ARGS', '--no-sandbox,--disable-setuid-sandbox');
     const argsArray = args.split(',').map(arg => arg.trim());
-    argsArray.push('--remote-debugging-port=3002');
+    argsArray.push('--remote-debugging-port=9222');
     return argsArray;
   }
 
@@ -181,5 +181,24 @@ export class PuppeteerService implements OnModuleDestroy {
    */
   async onModuleDestroy() {
     await this.closeBrowser();
+  }
+
+  /**
+   * Executes a function with retry logic.
+   * @param fn - The function to execute.
+   * @param retries - The number of retries (default is 3).
+   * @returns The result of the function execution.
+   */
+  async executeWithRetry<T>(fn: () => Promise<T>, retries: number = 3): Promise<T> {
+    try {
+      return await fn();
+    } catch (error: any) {
+      if (retries > 0) {
+        this.logger.warn(`Retrying due to error: ${error.message}. Retries left: ${retries}`);
+        return this.executeWithRetry(fn, retries - 1);
+      } else {
+        throw error;
+      }
+    }
   }
 }

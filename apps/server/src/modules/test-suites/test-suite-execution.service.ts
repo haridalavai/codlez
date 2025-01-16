@@ -114,7 +114,7 @@ export class TestSuiteExecutionService {
       await this.screenshooter.stop();
 
       this.logger.log('Closing browser...');
-      await browser.close();
+      // await browser.close();
       this.logger.log('Browser closed.');
     } catch (error) {
       this.logger.error('Error executing test suite:', error);
