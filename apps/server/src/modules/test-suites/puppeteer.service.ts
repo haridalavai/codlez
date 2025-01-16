@@ -9,7 +9,7 @@ import { TestCaseStatus } from './test-suites.service';
  * Service responsible for managing Puppeteer browser instances and executing test commands.
  */
 @Injectable()
-export class PuppeteerService implements OnModuleDestroy {
+export class PuppeteerService  {
   private readonly logger = new Logger(PuppeteerService.name);
   private browser: Browser | null = null;
 
@@ -36,11 +36,13 @@ export class PuppeteerService implements OnModuleDestroy {
     };
 
     try {
-      this.browser = await puppeteer.launch(launchOptions);
+      this.browser = await puppeteer.connect({
+        browserWSEndpoint: 'ws://localhost:3000/'
+      });
       this.logger.log('Browser launched successfully with options:', launchOptions);
       return this.browser;
-    } catch (error) {
-      this.logger.error('Failed to launch browser:', error);
+    } catch (error: any) {
+      this.logger.error('Failed to launch browser:', error?.message);
       throw new Error('BrowserLaunchError: Unable to launch Puppeteer browser.');
     }
   }
@@ -49,12 +51,12 @@ export class PuppeteerService implements OnModuleDestroy {
    * Retrieves the WebSocket debugger URL for the launched browser.
    * @returns The WebSocket debugger URL as a string.
    */
-  async getDebuggerUrl(): Promise<string> {
+  async getDebuggerUrl(pageId: string): Promise<string> {
     if (!this.browser) {
       throw new Error('BrowserNotLaunchedError: Browser has not been launched yet.');
     }
     const wsEndpoint = this.browser.wsEndpoint();
-    const debuggerUrl = `http://localhost:9222/devtools/inspector.html?ws=${wsEndpoint}`;
+    const debuggerUrl = `http://localhost:3000/v1/devtools/inspector.html?pageId=${pageId}`;
     this.logger.debug(`Debugger URL: ${debuggerUrl}`);
     return debuggerUrl;
   }
@@ -179,9 +181,9 @@ export class PuppeteerService implements OnModuleDestroy {
   /**
    * Lifecycle hook to ensure the browser is closed when the application is shutting down.
    */
-  async onModuleDestroy() {
-    await this.closeBrowser();
-  }
+  // async onModuleDestroy() {
+  //   await this.closeBrowser();
+  // }
 
   /**
    * Executes a function with retry logic.

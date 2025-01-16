@@ -27,7 +27,7 @@ type ActionType =
       payload: string;
     };
 
-const url = "http://localhost:3002";
+const url = "http://127.0.0.1:3002";
 const SocketContext = React.createContext<SocketContextData>({
   socket: null,
   state: {

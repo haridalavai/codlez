@@ -84,11 +84,14 @@ export class TestSuiteExecutionService {
       await this.screenshooter.init(page, socket, {}, testSuiteId);
       await this.screenshooter.start();
 
+      const pageId = page.target()._targetId
+
       this.logger.log(`Navigating to URL: ${testSuite.url}`);
       await page.goto(testSuite.url, { waitUntil: 'networkidle2' });
 
       // Emit the debugger URL to the frontend
-      const debuggerUrl = await this.puppeteerService.getDebuggerUrl();
+      
+      const debuggerUrl = await this.puppeteerService.getDebuggerUrl(pageId);
       socket.emit(`debugger-url-${testSuiteId}`, { url: debuggerUrl });
 
       // Update test suite status to RUNNING

@@ -99,13 +99,14 @@ const LiveStreamer = ({ testSuiteId, debuggerUrl }: LiveStreamerProps) => {
           />
         )}
       </div>
-      {debuggerUrl.length > 0 && (
+      {/* {debuggerUrl.length > 0 && (
         <iframe
           src={debuggerUrl}
           className="w-full flex-1 h-full"
           title="Debugger"
         ></iframe>
-      )} 
+      )}  */}
+      
     </div>
   );
 };
