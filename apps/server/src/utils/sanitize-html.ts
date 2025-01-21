@@ -1,4 +1,4 @@
-import * as sanitize from 'sanitize-html';
+import sanitizeHtml  from 'sanitize-html';
 
 /**
  * The reason for sanitization is because OpenAI does not need all of the HTML tags
@@ -11,8 +11,8 @@ import * as sanitize from 'sanitize-html';
  * For instructions that rely on visual cues (e.g. "click red button") we intend to
  * combine HTML with screenshots in the future versions of this library.
  */
-export const sanitizeHtml = (subject: string) => {
-  return sanitize(subject, {
+export const sanitizeHTML = (subject: string) => {
+  return sanitizeHtml(subject, {
     // The default allowedTags list already includes _a lot_ of commonly used tags.
     // https://www.npmjs.com/package/sanitize-html#default-options
     //

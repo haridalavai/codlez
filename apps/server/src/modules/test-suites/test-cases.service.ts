@@ -2,10 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma.service';
 import { CreateTestCaseDto } from './dtos/create-test-case.dto';
 import { CurrentUser } from 'src/types';
+import { getLocator } from 'src/utils/get-locator';
+import { getSnapshot } from 'src/utils/get-page-content';
+import { PuppeteerService } from './puppeteer.service';
+import { DomService } from './dom.service';
 
 @Injectable()
 export class TestCasesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private puppeteerService: PuppeteerService,
+    private domService: DomService,
+  ) {}
 
   async createTestCase(
     testSuiteId: string,
@@ -57,7 +65,10 @@ export class TestCasesService {
     return newTestCase;
   }
 
-  private async connectPreviousTestCase(previousTestCaseId: string, newTestCaseId: string) {
+  private async connectPreviousTestCase(
+    previousTestCaseId: string,
+    newTestCaseId: string,
+  ) {
     const previousTestCase = await this.prisma.test_cases.findUnique({
       where: { id: previousTestCaseId },
     });
@@ -81,7 +92,10 @@ export class TestCasesService {
     });
   }
 
-  private async connectNextTestCase(nextTestCaseId: string, newTestCaseId: string) {
+  private async connectNextTestCase(
+    nextTestCaseId: string,
+    newTestCaseId: string,
+  ) {
     const nextTestCase = await this.prisma.test_cases.findUnique({
       where: { id: nextTestCaseId },
     });
@@ -119,10 +133,13 @@ export class TestCasesService {
       throw new NotFoundException('Test case not found');
     }
 
-    const testCasesMap = testSuite.test_cases.reduce((acc, testCase) => {
-      acc[testCase.id] = testCase;
-      return acc;
-    }, {} as Record<string, any>);
+    const testCasesMap = testSuite.test_cases.reduce(
+      (acc, testCase) => {
+        acc[testCase.id] = testCase;
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     for (let i = 0; i < testCaseIds.length; i++) {
       const testCaseId = testCaseIds[i];
@@ -170,4 +187,3 @@ export class TestCasesService {
 
   // Additional Test Case related methods can be added here
 }
-

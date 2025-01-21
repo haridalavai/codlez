@@ -6,6 +6,7 @@ import { TestSuiteGateway } from './test-suite.gateway';
 import { PuppeteerService } from './puppeteer.service';
 import { TestCasesService } from './test-cases.service';
 import { TestSuiteExecutionService } from './test-suite-execution.service';
+import { DomService } from './dom.service';
 import PuppeteerMassScreenshots from './screenshooter';
 
 @Module({
@@ -19,6 +20,7 @@ import PuppeteerMassScreenshots from './screenshooter';
     TestSuiteGateway,
     PuppeteerService,
     PuppeteerMassScreenshots,
+    DomService,
   ],
 })
 export class TestSuitesModule {}

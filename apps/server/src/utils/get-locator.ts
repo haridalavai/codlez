@@ -5,13 +5,14 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { prompt as getPrompt } from './prompt';
 
 interface LocatorOutput {
-  css_selector: string;
+  xpath: string;
   content?: string;
   command: string;
+  element_index: number;
 }
 
-const getLocator = async (snapshot: string, action: string) => {
-  const model = new ChatOpenAI({ model: 'gpt-4o' });
+const getLocator = async (snapshot: any, action: string, interactiveElements: any, url: string) => {
+  const model = new ChatOpenAI({ model: 'o1-mini' });
 
   const prompt = ChatPromptTemplate.fromTemplate(getPrompt());
 
@@ -23,7 +24,7 @@ const getLocator = async (snapshot: string, action: string) => {
 
   const chain = partialedPrompt.pipe(model).pipe(parser);
 
-  const res = await chain.invoke({ dom: snapshot });
+  const res = await chain.invoke({ dom: snapshot, interactive_elements: interactiveElements, current_url: url });
   console.log(res);
   return res;
 };

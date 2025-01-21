@@ -11,6 +11,6 @@ export class AppController {
   @Get()
   getHello(@CurrentUser() currentUser: any): string {
     console.log('currentUser', currentUser);
-    return this.appService.getHello();
+    return 
   }
 }

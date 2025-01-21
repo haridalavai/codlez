@@ -19,7 +19,7 @@ import puppeteer from 'puppeteer';
 @UseFilters(WSExceptionFilter)
 @WebSocketGateway({
   cors: {
-    origin: ['http://127.0.0.1:3003'],
+    origin: ['http://localhost:3003'],
     credentials: true,
   },
   pingInterval: 10000,

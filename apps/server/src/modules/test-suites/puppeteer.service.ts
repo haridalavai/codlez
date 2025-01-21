@@ -1,6 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import puppeteer, { VanillaPuppeteer } from 'puppeteer-extra';
-import { Browser, Page, LaunchOptions, ScreenshotOptions } from 'puppeteer';
+import {
+  Browser,
+  Page,
+  LaunchOptions,
+  ScreenshotOptions,
+  KeyInput,
+} from 'puppeteer';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { ConfigService } from '@nestjs/config';
 import { TestCaseStatus } from './test-suites.service';
@@ -9,7 +15,7 @@ import { TestCaseStatus } from './test-suites.service';
  * Service responsible for managing Puppeteer browser instances and executing test commands.
  */
 @Injectable()
-export class PuppeteerService  {
+export class PuppeteerService {
   private readonly logger = new Logger(PuppeteerService.name);
   private browser: Browser | null = null;
 
@@ -36,14 +42,20 @@ export class PuppeteerService  {
     };
 
     try {
-      this.browser = await puppeteer.connect({
-        browserWSEndpoint: 'ws://localhost:3000/'
-      });
-      this.logger.log('Browser launched successfully with options:', launchOptions);
+      // this.browser = await puppeteer.connect({
+      //   browserWSEndpoint: 'ws://localhost:3000/'
+      // });
+      this.browser = await puppeteer.launch(launchOptions);
+      this.logger.log(
+        'Browser launched successfully with options:',
+        launchOptions,
+      );
       return this.browser;
-    } catch (error: any) {
-      this.logger.error('Failed to launch browser:', error?.message);
-      throw new Error('BrowserLaunchError: Unable to launch Puppeteer browser.');
+    } catch (error) {
+      this.logger.error('Failed to launch browser:', error, Object.keys(error));
+      throw new Error(
+        'BrowserLaunchError: Unable to launch Puppeteer browser.',
+      );
     }
   }
 
@@ -53,7 +65,9 @@ export class PuppeteerService  {
    */
   async getDebuggerUrl(pageId: string): Promise<string> {
     if (!this.browser) {
-      throw new Error('BrowserNotLaunchedError: Browser has not been launched yet.');
+      throw new Error(
+        'BrowserNotLaunchedError: Browser has not been launched yet.',
+      );
     }
     const wsEndpoint = this.browser.wsEndpoint();
     const debuggerUrl = `http://localhost:3000/v1/devtools/inspector.html?pageId=${pageId}`;
@@ -84,10 +98,14 @@ export class PuppeteerService  {
 
         case 'TYPE':
           if (value === undefined) {
-            throw new Error('TypeCommandError: No value provided for TYPE command.');
+            throw new Error(
+              'TypeCommandError: No value provided for TYPE command.',
+            );
           }
           await page.type(locator, value);
-          this.logger.debug(`Executed TYPE on selector: ${locator} with value: ${value}`);
+          this.logger.debug(
+            `Executed TYPE on selector: ${locator} with value: ${value}`,
+          );
           return { status: TestCaseStatus.PASSED };
 
         case 'SCROLL':
@@ -103,6 +121,16 @@ export class PuppeteerService  {
           this.logger.debug(`Executed HOVER on selector: ${locator}`);
           return { status: TestCaseStatus.PASSED };
 
+        case 'WAIT':
+          if (value === undefined) {
+            throw new Error(
+              'WaitCommandError: No value provided for WAIT command.',
+            );
+          }
+          page.setDefaultTimeout(parseInt(value));
+          this.logger.debug(`Executed WAIT for ${value} on selector: ${locator}`);
+          return { status: TestCaseStatus.PASSED };
+
         case 'CAPTURE':
           const screenshotOptions: ScreenshotOptions = {
             path: `screenshot-${Date.now()}.png`,
@@ -110,6 +138,16 @@ export class PuppeteerService  {
           };
           await page.screenshot(screenshotOptions);
           this.logger.debug(`Captured screenshot: ${screenshotOptions.path}`);
+          return { status: TestCaseStatus.PASSED };
+
+        case 'KEYBOARD':
+          if (value === undefined) {
+            throw new Error(
+              'KeyboardCommandError: No value provided for KEYBOARD command.',
+            );
+          }
+          await page.keyboard.press(value as KeyInput);
+          this.logger.debug(`Executed KEYBOARD command with key: ${value}`);
           return { status: TestCaseStatus.PASSED };
 
         default:
@@ -145,7 +183,10 @@ export class PuppeteerService  {
    * @returns A boolean indicating whether to run in headless mode.
    */
   private getHeadlessMode(): boolean {
-    const headless = this.configService.get<string>('PUPPETEER_HEADLESS', 'true');
+    const headless = this.configService.get<string>(
+      'PUPPETEER_HEADLESS',
+      'true',
+    );
     return false;
   }
 
@@ -154,8 +195,11 @@ export class PuppeteerService  {
    * @returns An array of browser arguments.
    */
   private getBrowserArgs(): string[] {
-    const args = this.configService.get<string>('PUPPETEER_ARGS', '--no-sandbox,--disable-setuid-sandbox');
-    const argsArray = args.split(',').map(arg => arg.trim());
+    const args = this.configService.get<string>(
+      'PUPPETEER_ARGS',
+      '--no-sandbox,--disable-setuid-sandbox',
+    );
+    const argsArray = args.split(',').map((arg) => arg.trim());
     argsArray.push('--remote-debugging-port=9222');
     return argsArray;
   }
@@ -165,7 +209,10 @@ export class PuppeteerService  {
    * @returns A number representing the launch timeout in milliseconds.
    */
   private getLaunchTimeout(): number {
-    const timeout = this.configService.get<number>('PUPPETEER_LAUNCH_TIMEOUT', 500000);
+    const timeout = this.configService.get<number>(
+      'PUPPETEER_LAUNCH_TIMEOUT',
+      500000,
+    );
     return timeout;
   }
 
@@ -174,7 +221,10 @@ export class PuppeteerService  {
    * @returns A boolean indicating whether to open devtools.
    */
   private getDevtools(): boolean {
-    const devtools = this.configService.get<string>('PUPPETEER_DEVTOOLS', 'false');
+    const devtools = this.configService.get<string>(
+      'PUPPETEER_DEVTOOLS',
+      'false',
+    );
     return devtools.toLowerCase() === 'true';
   }
 
@@ -191,12 +241,17 @@ export class PuppeteerService  {
    * @param retries - The number of retries (default is 3).
    * @returns The result of the function execution.
    */
-  async executeWithRetry<T>(fn: () => Promise<T>, retries: number = 3): Promise<T> {
+  async executeWithRetry<T>(
+    fn: () => Promise<T>,
+    retries: number = 3,
+  ): Promise<T> {
     try {
       return await fn();
     } catch (error: any) {
       if (retries > 0) {
-        this.logger.warn(`Retrying due to error: ${error.message}. Retries left: ${retries}`);
+        this.logger.warn(
+          `Retrying due to error: ${error.message}. Retries left: ${retries}`,
+        );
         return this.executeWithRetry(fn, retries - 1);
       } else {
         throw error;

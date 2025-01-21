@@ -1,8 +1,8 @@
 import { Page } from 'puppeteer';
-import { sanitizeHtml } from './sanitize-html';
+import { sanitizeHTML } from './sanitize-html';
 
 export const getSnapshot = async (page: Page) => {
   return {
-    dom: sanitizeHtml(await page.content()),
+    dom: sanitizeHTML(await page.content()),
   };
 };
