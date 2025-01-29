@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant"; // NEW
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 import TestCase from "./test-case";
 import {
@@ -98,30 +99,28 @@ const ListViewTestCases = ({
     }
   }
 
-
-
-
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col gap-2 mx-2">
-        <SortableContext
-          items={testCasesOrderedList}
-          strategy={verticalListSortingStrategy}
-        >
-          <CreateTestCaseComponent
-            testSuiteId={testSuiteId}
-            nextTestCaseId={testCases ? testCases[0]?.id : null}
-            previousTestCaseId={null}
-            createTestCase={createTestCase}
-            orderTestCases={orderTestCases}
-          />
+      <SortableContext
+        items={testCasesOrderedList}
+        strategy={verticalListSortingStrategy}
+      >
+        <CreateTestCaseComponent
+        className="mt-2 "
+          testSuiteId={testSuiteId}
+          nextTestCaseId={testCases ? testCases[0]?.id : null}
+          previousTestCaseId={null}
+          createTestCase={createTestCase}
+          orderTestCases={orderTestCases}
+        />
+        <ScrollArea className="flex flex-col h-full pb-14 pt-2 pl-2 pr-4">
           {testCasesOrderedList.map((testCase) => {
             return (
-              <div className="flex flex-col">
+              <>
                 <TestCase
                   key={testCase.id}
                   cardId={testCase.id}
@@ -131,18 +130,20 @@ const ListViewTestCases = ({
                   status={testCase.latest_result}
                   updateTestCaseStatus={updateTestCaseStatus}
                 />
-                <CreateTestCaseComponent
-                  testSuiteId={testSuiteId}
-                  nextTestCaseId={testCase.next_test_case_id}
-                  previousTestCaseId={testCase.id}
-                  createTestCase={createTestCase}
-                  orderTestCases={orderTestCases}
-                />
-              </div>
+                <div className="flex flex-col my-1">
+                  <CreateTestCaseComponent
+                    testSuiteId={testSuiteId}
+                    nextTestCaseId={testCase.next_test_case_id}
+                    previousTestCaseId={testCase.id}
+                    createTestCase={createTestCase}
+                    orderTestCases={orderTestCases}
+                  />
+                </div>
+              </>
             );
           })}
-        </SortableContext>
-      </div>
+        </ScrollArea>
+      </SortableContext>
     </DndContext>
   );
 };

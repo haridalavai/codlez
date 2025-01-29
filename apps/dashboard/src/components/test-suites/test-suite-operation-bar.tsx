@@ -14,7 +14,7 @@ const OperationBar = (props: OperationBarProps) => {
     <div className="w-full border border-b-1 border-t-0 border-l-0 border-r-0 ">
 
     <Card
-      className="flex flex-row justify-between rounded-md mx-2 my-3 items-center p-3  w-fit "
+      className="flex flex-row justify-between rounded-md mx-2 my-2 items-center p-3  w-fit "
       {...props}
       
       >

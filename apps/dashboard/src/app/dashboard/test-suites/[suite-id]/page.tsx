@@ -135,7 +135,7 @@ const SuitPage = ({ params }: { params: { "suite-id": string } }) => {
   return (
     <DashboardShell className="h-full">
       <ResizablePanelGroup direction="horizontal" className="h-full">
-        <ResizablePanel className="h-full flex flex-col">
+        <ResizablePanel className="h-full flex flex-col overflow-auto">
           <TestSuiteDetails testSuite={testSuite} />
           <OperationBar onStartExecution={handleStartExecution} />
           <ListViewTestCases

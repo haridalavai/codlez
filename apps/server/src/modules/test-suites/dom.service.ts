@@ -1,6 +1,7 @@
 import { Page } from 'puppeteer';
 import { buildDomTree } from './build-dom-tree';
 import { Injectable } from '@nestjs/common';
+import { DOMElementNode } from './dom';
 
 @Injectable()
 export class DomService {
@@ -34,18 +35,18 @@ export class DomService {
 
     const tagName = nodeData.tagName;
 
-    const elementNode: any = {
+    const elementNode: DOMElementNode = new DOMElementNode(
       tagName,
-      xpath: nodeData.xpath,
-      attributes: nodeData.attributes || {},
-      children: [],
-      isVisible: nodeData.isVisible || false,
-      isInteractive: nodeData.isInteractive || false,
-      isTopElement: nodeData.isTopElement || false,
-      highlightIndex: nodeData.highlightIndex,
-      shadowRoot: nodeData.shadowRoot || false,
+      nodeData.xpath,
+      nodeData.attributes || {},
+      [],
+      nodeData.isVisible || false,
+      nodeData.isInteractive || false,
+      nodeData.isTopElement || false,
+      nodeData.highlightIndex,
+      nodeData.shadowRoot || false,
       parent,
-    };
+    );
 
     const children: any[] = [];
     for (const child of nodeData.children || []) {
@@ -63,12 +64,12 @@ export class DomService {
   }
 
   private createSelectorMap(elementTree: any) {
-    const selectorMap = {};
+    const selectorMap = new Map<string, DOMElementNode>();
 
-    const processNode = (node: any) => {
+    const processNode = (node: DOMElementNode) => {
       if (node) {
         if (node.highlightIndex) {
-          selectorMap[node.highlightIndex] = node;
+          selectorMap.set(node.highlightIndex.toString(), node);
         }
 
         // for (const child of node?.children) {

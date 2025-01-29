@@ -166,6 +166,7 @@ export class TestSuiteExecutionService {
     let currentTestCase = testCases.find(
       (testCase) => testCase.id === currentTestCaseId,
     );
+    console.log('currentTestCase', currentTestCase);
     while (currentTestCase) {
       this.logger.log(`Executing test case: ${currentTestCase.id}`);
 
@@ -193,19 +194,28 @@ export class TestSuiteExecutionService {
         },
       });
 
-      // const snapshot = await getSnapshot(page);
+      const snapshot = await getSnapshot(page);
       // console.log('snapshot', snapshot, currentTestCase.command);
       // const locator = await getLocator(snapshot.dom, currentTestCase.action);
 
       const { elementTree, selectorMap } =
         await this.domService.getClickableElements(page);
-      console.log('elementTree', elementTree);
-      console.log('selectorMap', selectorMap);
+      // console.log('elementTree', elementTree);
+      console.log('selectorMap', selectorMap, selectorMap.keys());
+
+      const selectorMapString = []
+
+      for (const [key, value] of selectorMap) {
+        selectorMapString.push(`${key} - ${value.toString()}`);
+      }
+
+      console.log('selectorMapString', selectorMapString);
+
 
       const locator = await getLocator(
-        elementTree,
+        snapshot.dom,
         currentTestCase.action,
-        selectorMap,
+        selectorMapString,
         currentTestCase.url,
       );
 
@@ -250,7 +260,7 @@ export class TestSuiteExecutionService {
 
       // Move to the next test case
       currentTestCase = testCases.find(
-        (testCase) => testCase.id === currentTestCase.next_test_case?.id,
+        (testCase) => testCase.id === currentTestCase.next_test_case_id,
       );
     }
   }

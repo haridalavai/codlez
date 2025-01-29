@@ -11,7 +11,12 @@ interface LocatorOutput {
   element_index: number;
 }
 
-const getLocator = async (snapshot: any, action: string, interactiveElements: any, url: string) => {
+const getLocator = async (
+  snapshot: any,
+  action: string,
+  interactiveElements: any,
+  url: string,
+) => {
   const model = new ChatOpenAI({ model: 'o1-mini' });
 
   const prompt = ChatPromptTemplate.fromTemplate(getPrompt());
@@ -24,7 +29,12 @@ const getLocator = async (snapshot: any, action: string, interactiveElements: an
 
   const chain = partialedPrompt.pipe(model).pipe(parser);
 
-  const res = await chain.invoke({ dom: snapshot, interactive_elements: interactiveElements, current_url: url });
+  const res = await chain.invoke({
+    dom: snapshot,
+    interactive_elements: interactiveElements,
+    current_url: url,
+    task: action,
+  });
   console.log(res);
   return res;
 };

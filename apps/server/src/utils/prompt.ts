@@ -51,12 +51,13 @@ OUTPUT STRUCTURE:
         "command": "your-command",
         "element-index": "element-index"
     }}
-
+\`\`\`
 ----------input----------
 current_url: {current_url}
 dom: {dom}
 interactive_elements: {interactive_elements}
 task: {task}
 -------------------------
+\`\`\`
 `;
 };

@@ -60,8 +60,8 @@ export class DOMElementNode implements DomBaseNode {
     if (this.isShadowRoot) {
       extras.push('shadow-root');
     }
-    if (this.highlightIndex !== undefined) {
-      extras.push(`highlight:${this.highlightIndex}`);
+    if (this.highlightIndex ) {
+      extras.push(`highlight-index:${this.highlightIndex}`);
     }
 
     return tagStr + (extras.length > 0 ? ` (${extras.join(', ')})` : '');

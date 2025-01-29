@@ -502,5 +502,14 @@ export async function buildDomTree(page: Page) {
     return buildDomTree(document.body);
   });
 
+//   remove highlights
+
+    await page.evaluate(() => {
+        const container = document.getElementById('playwright-highlight-container');
+        if (container) {
+        container.remove();
+        }
+    });
+
   return domTree;
 }

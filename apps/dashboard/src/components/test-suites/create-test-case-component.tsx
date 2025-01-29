@@ -4,7 +4,7 @@ import { Input } from "@repo/ui/components/ui/input";
 import { cn } from "@repo/ui/lib/utils";
 import React, { useState } from "react";
 
-interface CreateTestCaseComponentProps {
+interface CreateTestCaseComponentProps  extends React.HTMLAttributes<HTMLDivElement> {
   testSuiteId: string;
   previousTestCaseId: string | null;
   nextTestCaseId: string | null;
@@ -18,6 +18,7 @@ const CreateTestCaseComponent = ({
   previousTestCaseId,
   createTestCase,
   orderTestCases,
+  className,
 }: CreateTestCaseComponentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -64,13 +65,14 @@ const CreateTestCaseComponent = ({
   return (
     <div
       className={cn([
-        "relative w-full  group",
+        className,
+        "relative w-full  group z-50",
         isEditing ? "h-full" : "h-[1px]",
       ])}
     >
       <div
         className={cn([
-          "inset-x-0  -bottom-1 flex items-center justify-center",
+          "inset-x-0   flex items-center justify-center",
           isEditing ? "relative" : "absolute",
         ])}
       >
